@@ -1,0 +1,16 @@
+# Граф зависимостей Maven
+
+direction: right
+classes: {
+  style: {
+    stroke: green
+    fill: lightgreen
+  }
+}
+
+"junit:junit"
+"org.hamcrest:hamcrest-core"
+"org.hamcrest:hamcrest-library"
+"junit:junit" -> "org.hamcrest:hamcrest-core"
+"org.hamcrest:hamcrest-core" -> "org.hamcrest:hamcrest-library"
+"org.hamcrest:hamcrest-library" -> "junit:junit"
