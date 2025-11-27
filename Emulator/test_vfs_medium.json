@@ -1,0 +1,27 @@
+{
+    "name": "root",
+    "type": "directory", 
+    "children": [
+        {
+            "name": "documents",
+            "type": "directory",
+            "children": [
+                {
+                    "name": "file1.txt",
+                    "type": "file", 
+                    "content": "Содержимое file1"
+                },
+                {
+                    "name": "file2.txt", 
+                    "type": "file",
+                    "content": "Содержимое file2"
+                }
+            ]
+        },
+        {
+            "name": "config.ini",
+            "type": "file",
+            "content": "key1=value1\nkey2=value2"
+        }
+    ]
+}

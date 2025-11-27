@@ -1,0 +1,28 @@
+# Комплексный тест всех возможностей эмулятора
+echo === ТЕСТ 1: Информация и справка ===
+vfs_info
+help
+
+echo === ТЕСТ 2: Работа с файловой системой ===
+ls
+ls system
+cat readme.md
+
+echo === ТЕСТ 3: Навигация по папкам ===  
+ls system/bin
+cat system/config/system.conf
+
+echo === ТЕСТ 4: Глубокие уровни вложенности ===
+ls users
+ls users/alice
+ls users/alice/documents
+cat users/alice/documents/notes.txt
+
+echo === ТЕСТ 5: Обработка ошибок ===
+ls nonexistent
+cat unknown_file.txt
+ls system/bin/app.exe
+
+echo === ТЕСТ 6: Успешное завершение ===
+echo Все тесты пройдены успешно!
+vfs_info

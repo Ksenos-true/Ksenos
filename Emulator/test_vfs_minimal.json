@@ -1,0 +1,11 @@
+{
+    "name": "root",
+    "type": "directory",
+    "children": [
+        {
+            "name": "readme.txt",
+            "type": "file",
+            "content": "Минимальная тестовая VFS\nВсего один файл"
+        }
+    ]
+}
