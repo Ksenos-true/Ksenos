@@ -1,0 +1,6 @@
+[
+  {"instruction": "LOAD_CONST", "operands": [45]},
+  {"instruction": "READ_MEM", "operands": [829]},
+  {"instruction": "WRITE_MEM", "operands": []},
+  {"instruction": "DIV", "operands": [125]}
+]

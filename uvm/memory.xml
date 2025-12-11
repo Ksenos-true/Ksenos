@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<memory_dump>
+  <range start="0x00000000" end="0x00000032"/>
+  <data>
+    <line addr="0x00000000">
+      <hex>2B 05 00 00 2B 32 00 00 48 00 64 00 00 00 00 00</hex>
+      <ascii>+...+2..H.d.....</ascii>
+    </line>
+    <line addr="0x00000010">
+      <hex>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</hex>
+      <ascii>................</ascii>
+    </line>
+    <line addr="0x00000020">
+      <hex>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</hex>
+      <ascii>................</ascii>
+    </line>
+    <line addr="0x00000030">
+      <hex>00 00</hex>
+      <ascii>..</ascii>
+    </line>
+  </data>
+</memory_dump>

@@ -1,0 +1,5 @@
+[
+  {"instruction": "LOAD_CONST", "operands": [45]},
+  {"instruction": "LOAD_CONST", "operands": [100]},
+  {"instruction": "WRITE_MEM", "operands": []}
+]
