@@ -1,0 +1,248 @@
+using UVM_Assembler.Assembler;
+using UVM_Assembler.Interpreter;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            PrintUsage();
+            return;
+        }
+        
+        string mode = args[0].ToLower();
+        
+        switch (mode)
+        {
+            case "assemble":
+                RunAssembler(args);
+                break;
+                
+            case "interpret":
+                RunInterpreter(args);
+                break;
+                
+            case "test":
+                RunTests();
+                break;
+                
+            default:
+                Console.WriteLine($"Unknown mode: {mode}");
+                PrintUsage();
+                break;
+        }
+    }
+    
+    static void RunAssembler(string[] args)
+    {
+        if (args.Length < 3)
+        {
+            Console.WriteLine("Usage: assemble <input.json> <output.bin> [test]");
+            return;
+        }
+        
+        string inputPath = args[1];
+        string outputPath = args[2];
+        bool testMode = args.Length > 3 && args[3].ToLower() == "test";
+        
+        try
+        {
+            Program program = Assembler.AssembleFromJsonFile(inputPath);
+            
+            if (testMode)
+            {
+                Assembler.DisplayTestMode(program);
+            }
+            
+            Assembler.SaveToBinaryFile(program, outputPath);
+            Console.WriteLine($"Program assembled and saved to {outputPath}");
+            Console.WriteLine($"Size: {program.Instructions.Count} instructions ({program.Instructions.Count * 4} bytes)");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+    
+    static void RunInterpreter(string[] args)
+    {
+        if (args.Length < 4)
+        {
+            Console.WriteLine("Usage: interpret <program.bin> <memory_dump.xml> <start_addr> <end_addr>");
+            return;
+        }
+        
+        string programPath = args[1];
+        string dumpPath = args[2];
+        int startAddr = int.Parse(args[3]);
+        int endAddr = int.Parse(args[4]);
+        
+        try
+        {
+            Assembler.Program program = Assembler.LoadProgramFromBinary(programPath);
+            
+            Interpreter interpreter = new Interpreter();
+            interpreter.Execute(program);
+            interpreter.SaveMemoryDump(dumpPath, startAddr, endAddr);
+            
+            Console.WriteLine($"Program executed successfully.");
+            Console.WriteLine($"Memory dump ({startAddr}-{endAddr}) saved to {dumpPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"StackTrace: {ex.StackTrace}");
+        }
+    }
+    
+    static void RunTests()
+    {
+        Console.WriteLine("Running tests from specification...\n");
+        
+        bool allTestsPassed = true;
+        
+        // Тест 1: Загрузка константы (A=43, B=45)
+        allTestsPassed &= TestInstruction("LOAD_CONST", 
+            InstructionType.LOAD_CONST, 
+            45, 
+            new byte[] { 0xAB, 0x16, 0x00, 0x00 });
+        
+        // Тест 2: Чтение из памяти (A=120, B=829)
+        allTestsPassed &= TestInstruction("READ_MEM", 
+            InstructionType.READ_MEM, 
+            829, 
+            new byte[] { 0xF8, 0x9E, 0x01, 0x00 });
+        
+        // Тест 3: Запись в память (A=72)
+        allTestsPassed &= TestInstruction("WRITE_MEM", 
+            InstructionType.WRITE_MEM, 
+            null, 
+            new byte[] { 0x48, 0x00, 0x00, 0x00 });
+        
+        // Тест 4: Деление (A=121, B=125)
+        allTestsPassed &= TestInstruction("DIVIDE", 
+            InstructionType.DIVIDE, 
+            125, 
+            new byte[] { 0xF9, 0x3E, 0x00, 0x00 });
+        
+        Console.WriteLine($"\nAll tests passed: {allTestsPassed}");
+        
+        if (allTestsPassed)
+        {
+            Console.WriteLine("\nRunning integration test...");
+            RunIntegrationTest();
+        }
+    }
+    
+    static bool TestInstruction(string name, InstructionType type, int? bValue, byte[] expected)
+    {
+        Console.WriteLine($"Test: {name} (A={(int)type}, B={bValue})");
+        
+        var instruction = new Instruction(type, bValue);
+        var actual = instruction.ToBytes();
+        
+        Console.WriteLine($"Expected: {FormatBytes(expected)}");
+        Console.WriteLine($"Actual:   {FormatBytes(actual)}");
+        
+        bool match = true;
+        for (int i = 0; i < 4; i++)
+        {
+            if (actual[i] != expected[i])
+            {
+                Console.WriteLine($"  Byte {i}: expected 0x{expected[i]:X2}, got 0x{actual[i]:X2}");
+                match = false;
+            }
+        }
+        
+        Console.WriteLine($"Result: {(match ? "PASS" : "FAIL")}\n");
+        return match;
+    }
+    
+    static void RunIntegrationTest()
+    {
+        try
+        {
+            Console.WriteLine("Creating test program...");
+            
+            var program = new Assembler.Program();
+            
+            // Программа: загружаем константы и складываем их
+            program.Instructions.Add(new Instruction(InstructionType.LOAD_CONST, 100)); // Адрес для записи
+            program.Instructions.Add(new Instruction(InstructionType.LOAD_CONST, 42));  // Значение
+            program.Instructions.Add(new Instruction(InstructionType.WRITE_MEM));
+            
+            // Читаем обратно
+            program.Instructions.Add(new Instruction(InstructionType.LOAD_CONST, 100));
+            program.Instructions.Add(new Instruction(InstructionType.READ_MEM, 0));
+            
+            // Сохраняем результат
+            program.Instructions.Add(new Instruction(InstructionType.LOAD_CONST, 200));
+            program.Instructions.Add(new Instruction(InstructionType.WRITE_MEM));
+            
+            // Тест деления
+            program.Instructions.Add(new Instruction(InstructionType.LOAD_CONST, 300));
+            program.Instructions.Add(new Instruction(InstructionType.LOAD_CONST, 6)); // Делитель
+            program.Instructions.Add(new Instruction(InstructionType.WRITE_MEM));
+            
+            program.Instructions.Add(new Instruction(InstructionType.LOAD_CONST, 84)); // Делимое
+            program.Instructions.Add(new Instruction(InstructionType.DIVIDE, 300));
+            
+            program.Instructions.Add(new Instruction(InstructionType.LOAD_CONST, 400));
+            program.Instructions.Add(new Instruction(InstructionType.WRITE_MEM));
+            
+            Console.WriteLine("Program created successfully.");
+            Console.WriteLine($"Instructions: {program.Instructions.Count}");
+            
+            // Ассемблируем
+            byte[] bytes = program.Assemble();
+            Console.WriteLine($"Binary size: {bytes.Length} bytes");
+            
+            // Загружаем обратно
+            string tempFile = Path.GetTempFileName();
+            File.WriteAllBytes(tempFile, bytes);
+            
+            Assembler.Program loadedProgram = Assembler.LoadProgramFromBinary(tempFile);
+            Console.WriteLine($"Loaded instructions: {loadedProgram.Instructions.Count}");
+            
+            File.Delete(tempFile);
+            
+            Console.WriteLine("Integration test: PASS\n");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Integration test: FAIL - {ex.Message}");
+        }
+    }
+    
+    static string FormatBytes(byte[] bytes)
+    {
+        return string.Join(", ", bytes.Select(b => $"0x{b:X2}"));
+    }
+    
+    static void PrintUsage()
+    {
+        Console.WriteLine("UVM Assembler and Interpreter (Variant 19)");
+        Console.WriteLine("==========================================");
+        Console.WriteLine("Usage:");
+        Console.WriteLine("  assemble <input.json> <output.bin> [test]  - Assemble JSON program to binary");
+        Console.WriteLine("  interpret <program.bin> <dump.xml> <start> <end> - Execute program");
+        Console.WriteLine("  test                                       - Run specification tests");
+        Console.WriteLine();
+        Console.WriteLine("Examples:");
+        Console.WriteLine("  UVM_Assembler assemble program.json program.bin");
+        Console.WriteLine("  UVM_Assembler assemble program.json program.bin test");
+        Console.WriteLine("  UVM_Assembler interpret program.bin memory.xml 0 100");
+        Console.WriteLine("  UVM_Assembler test");
+        Console.WriteLine();
+        Console.WriteLine("JSON format example:");
+        Console.WriteLine(@"  {
+    ""instructions"": [
+      { ""type"": ""LOAD_CONST"", ""b"": 45 },
+      { ""type"": ""READ_MEM"", ""b"": 829 },
+      { ""type"": ""WRITE_MEM"" },
+      { ""type"": ""DIVIDE"", ""b"": 125 }
+    ]
+  }");
+    }
+}
