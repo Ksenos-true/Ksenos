@@ -25,7 +25,7 @@ def test_specific_instructions():
     print(f"LOAD_CONST (45): {binary.hex(' ')}")
     print(f"Ожидается:       {expected.hex(' ')}")
     if binary != expected:
-        print(f"❌ Ошибка: LOAD_CONST кодируется неверно")
+        print(f" Ошибка: LOAD_CONST кодируется неверно")
         return False
     
     # Тест READ_MEM (A=120, B=829)
@@ -35,7 +35,7 @@ def test_specific_instructions():
     print(f"\nREAD_MEM (829):  {binary.hex(' ')}")
     print(f"Ожидается:       {expected.hex(' ')}")
     if binary != expected:
-        print(f"❌ Ошибка: READ_MEM кодируется неверно")
+        print(f" Ошибка: READ_MEM кодируется неверно")
         return False
     
     # Тест WRITE_MEM (A=72)
@@ -45,7 +45,7 @@ def test_specific_instructions():
     print(f"\nWRITE_MEM:       {binary.hex(' ')}")
     print(f"Ожидается:       {expected.hex(' ')}")
     if binary != expected:
-        print(f"❌ Ошибка: WRITE_MEM кодируется неверно")
+        print(f" Ошибка: WRITE_MEM кодируется неверно")
         return False
     
     # Тест DIV (A=121, B=125)
@@ -55,11 +55,11 @@ def test_specific_instructions():
     print(f"\nDIV (125):       {binary.hex(' ')}")
     print(f"Ожидается:       {expected.hex(' ')}")
     if binary != expected:
-        print(f"❌ Ошибка: DIV кодируется неверно")
+        print(f" Ошибка: DIV кодируется неверно")
         return False
     
     print("\n" + "=" * 60)
-    print("✅ Все инструкции кодируются правильно!")
+    print(" Все инструкции кодируются правильно!")
     print("=" * 60)
     return True
 
@@ -104,7 +104,7 @@ def test_assembler_json():
             print(f"❌ Ошибка: неверный размер бинарного файла")
             return False
         
-        print("✅ Ассемблер работает корректно с JSON входом")
+        print(" Ассемблер работает корректно с JSON входом")
         return True
         
     finally:
@@ -190,16 +190,16 @@ def test_interpreter_array_copy():
         print(f"Скопированный массив: [{hex(copy1)}, {hex(copy2)}, {hex(copy3)}]")
         
         if val1 != copy1:
-            print(f"❌ Первое значение скопировано неверно")
+            print(f" Первое значение скопировано неверно")
             return False
         if val2 != copy2:
-            print(f"❌ Второе значение скопировано неверно")
+            print(f" Второе значение скопировано неверно")
             return False
         if val3 != copy3:
-            print(f"❌ Третье значение скопировано неверно")
+            print(f" Третье значение скопировано неверно")
             return False
         
-        print("✅ Копирование массива выполнено успешно!")
+        print(" Копирование массива выполнено успешно!")
         return True
         
     finally:
@@ -260,13 +260,13 @@ def test_division():
         print(f"Результат деления (100 / 25): {result}")
         
         if divisor != 25:
-            print(f"❌ Делитель записан неверно")
+            print(f" Делитель записан неверно")
             return False
         if result != 4:
-            print(f"❌ Результат деления неверен (100 / 25 = 4)")
+            print(f" Результат деления неверен (100 / 25 = 4)")
             return False
         
-        print("✅ Деление выполнено успешно!")
+        print(" Деление выполнено успешно!")
         return True
         
     finally:
@@ -305,14 +305,14 @@ def run_all_tests():
         print(f"ИТОГ: {tests_passed}/{total_tests} тестов пройдено")
         
         if tests_passed == total_tests:
-            print("✅ ВСЕ ТЕСТЫ ПРОЙДЕНЫ УСПЕШНО!")
+            print(" ВСЕ ТЕСТЫ ПРОЙДЕНЫ УСПЕШНО!")
             return True
         else:
-            print(f"❌ НЕ ВСЕ ТЕСТЫ ПРОЙДЕНЫ: {total_tests - tests_passed} тестов не пройдено")
+            print(f"НЕ ВСЕ ТЕСТЫ ПРОЙДЕНЫ: {total_tests - tests_passed} тестов не пройдено")
             return False
         
     except Exception as e:
-        print(f"\n❌ Ошибка при выполнении тестов: {e}")
+        print(f"\n Ошибка при выполнении тестов: {e}")
         import traceback
         traceback.print_exc()
         return False
